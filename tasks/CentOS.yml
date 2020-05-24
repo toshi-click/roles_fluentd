@@ -1,0 +1,78 @@
+- name: get RedHat fluentd install shell
+  get_url:
+    url: "https://toolbelt.treasuredata.com/sh/install-redhat-td-agent3.sh"
+    dest: /usr/local/src/install-redhat-td-agent3.sh
+    mode: 0755
+  tags: fluentd
+
+- name: run RedHat fluentd install shell
+  shell: bash /usr/local/src/install-redhat-td-agent3.sh
+  tags: fluentd
+# defaultで指定されているプラグインを導入するのに必要なパッケージ導入
+- name: packages install
+  package:
+    name: '{{ item.name }}'
+    state: '{{ item.state | default("present") }}'
+  with_items: '{{ fluentd_requre_packages }}'
+  tags: fluentd
+
+# よく使うプラグイン導入
+- name: fluentd plugin install
+  gem:
+    executable: /usr/sbin/td-agent-gem
+    name: "{{ item.name }}"
+    state: present
+    user_install: yes
+  with_items: '{{ fluentd_plugin }}'
+  tags: fluentd
+
+- name: custom td-agent.service set
+  template:
+    src: "td-agent.service"
+    dest: /etc/systemd/system/td-agent.service
+    owner: root
+    group: root
+    mode: 0644
+  tags: fluentd
+
+# systemdにconfigsを読み直すように強制する
+- name: just force systemd to reread configs
+  systemd:
+    daemon_reload: yes
+  ignore_errors: true
+  tags: fluentd
+
+- name: "create directory /etc/td-agent/certs"
+  file:
+    path: "/etc/td-agent/certs"
+    state: directory
+    owner: td-agent
+    group: td-agent
+    mode: 0700
+  tags: fluentd
+
+- name: fluentd.crt set
+  template:
+    src: "fluentd.crt"
+    dest: /etc/td-agent/certs/fluentd.crt
+    owner: td-agent
+    group: td-agent
+    mode: 0644
+  tags: fluentd
+
+- name: "create directory fluentd plugin /etc/td-agent/plugin"
+  file:
+    path: "/etc/td-agent/plugin"
+    state: directory
+    owner: td-agent
+    group: td-agent
+    mode: 0755
+
+- name: custom fluentd Plugin set
+  template:
+    src: "filter_ngrep.rb"
+    dest:  /etc/td-agent/plugin/filter_ngrep.rb
+    owner: root
+    group: root
+    mode: 0644
+  tags: fluentd

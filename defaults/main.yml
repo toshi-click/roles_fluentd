@@ -1,0 +1,26 @@
+---
+fluentd_user: td-agent
+fluentd_group: td-agent
+
+fluentd_requre_packages:
+  - name: gcc
+
+fluentd_plugin:
+  - name: fluent-plugin-google-cloud
+  - name: fluent-plugin-rewrite-tag-filter
+  - name: fluent-plugin-prometheus
+  - name: fluent-plugin-elasticsearch
+  - name: fluent-plugin-cloudwatch-logs
+  - name: fluent-plugin-slack
+  - name: fluent-plugin-tail-ex
+  - name: fluent-plugin-mail
+  - name: fluent-plugin-docker
+  - name: fluent-plugin-forest
+
+fluentd_gcp_flag: false
+fluentd_gcp_key_file: "/etc/td-agent/application_default_credentials.json"
+
+fluentd_aws_glag: false
+fluentd_aws_access_key_id: ""
+fluentd_aws_secret_access_key: ""
+fluentd_aws_region: ""
