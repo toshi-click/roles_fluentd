@@ -3,7 +3,8 @@ fluentd_user: td-agent
 fluentd_group: td-agent
 
 fluentd_requre_packages:
-  - name: gcc
+  - curl
+  - gcc
 
 fluentd_plugin:
   - name: fluent-plugin-google-cloud

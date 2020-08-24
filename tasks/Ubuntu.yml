@@ -9,19 +9,14 @@
   shell: bash /usr/local/src/install-ubuntu-xenial-td-agent3.sh
   tags: fluentd
 
-- name: make install
-  package:
-    name: make
+- name: apt install fluentd require packages install
+  apt:
+    name: "{{ packages }}"
+    update_cache: yes
+    cache_valid_time: 3600
     state: present
-  tags: fluentd
-
-# defaultで指定されているプラグインを導入するのに必要なパッケージ導入
-- name: packages install
-  package:
-    name: '{{ item.name }}'
-    state: '{{ item.state | default("present") }}'
-  with_items: '{{ fluentd_requre_packages }}'
-  tags: fluentd
+  vars:
+    packages: "{{ fluentd_requre_packages }}"
 
 # よく使うプラグイン導入
 - name: fluentd plugin install
